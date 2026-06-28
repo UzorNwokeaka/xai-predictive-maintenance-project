@@ -1,0 +1,101 @@
+engine_id,actual_rul,predicted_rul_lstm,predicted_rul_rf_explainable,health_status,risk_level,recommendation
+1,112,117.68987,118.40562451576636,Healthy,Low Risk,Continue normal operation.
+2,98,120.044685,111.16161425027252,Healthy,Low Risk,Continue normal operation.
+3,69,54.76884,60.58022649466837,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+4,82,100.87289,92.43150054936899,Healthy,Low Risk,Continue normal operation.
+5,91,103.46633,104.273348262336,Healthy,Low Risk,Continue normal operation.
+6,93,112.73229,106.27236477511339,Healthy,Low Risk,Continue normal operation.
+7,91,108.14265,105.71453179071969,Healthy,Low Risk,Continue normal operation.
+8,95,105.300606,92.5466255627297,Healthy,Low Risk,Continue normal operation.
+9,111,122.309586,105.37332917635047,Healthy,Low Risk,Continue normal operation.
+10,96,84.90501,106.55751493066256,Healthy,Low Risk,Continue normal operation.
+11,97,84.26558,71.20470712305244,Healthy,Low Risk,Continue normal operation.
+12,124,110.09161,86.68018173127729,Healthy,Low Risk,Continue normal operation.
+13,95,93.20183,96.81120928085215,Healthy,Low Risk,Continue normal operation.
+14,107,106.776146,104.33709071453958,Healthy,Low Risk,Continue normal operation.
+15,83,103.91467,120.45586118962431,Healthy,Low Risk,Continue normal operation.
+16,84,109.71977,111.59747228805288,Healthy,Low Risk,Continue normal operation.
+17,50,46.353382,53.053208622131066,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+18,28,31.117392,66.81801276524578,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+19,87,111.853294,110.27422060871395,Healthy,Low Risk,Continue normal operation.
+20,16,20.279644,25.332670215129177,Critical,High Risk,Immediate maintenance intervention recommended.
+21,57,92.50302,69.57078963887386,Healthy,Low Risk,Continue normal operation.
+22,111,121.0485,114.58634539177713,Healthy,Low Risk,Continue normal operation.
+23,113,125.0,118.83358708498113,Healthy,Low Risk,Continue normal operation.
+24,20,22.003979,27.594206543333442,Critical,High Risk,Immediate maintenance intervention recommended.
+25,125,107.81067,115.08818035451978,Healthy,Low Risk,Continue normal operation.
+26,119,113.31759,110.47434272218737,Healthy,Low Risk,Continue normal operation.
+27,66,101.19378,113.24842522186927,Healthy,Low Risk,Continue normal operation.
+28,97,116.86259,99.47374072985417,Healthy,Low Risk,Continue normal operation.
+29,90,103.33409,100.23183597706704,Healthy,Low Risk,Continue normal operation.
+30,115,110.5428,98.90842179699791,Healthy,Low Risk,Continue normal operation.
+31,8,9.942395,20.924168836046128,Critical,High Risk,Immediate maintenance intervention recommended.
+32,48,51.4795,52.9769411440799,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+33,106,113.8535,98.0746499741507,Healthy,Low Risk,Continue normal operation.
+34,7,7.7189074,6.608038533032383,Critical,High Risk,Immediate maintenance intervention recommended.
+35,11,10.354129,8.191632515589836,Critical,High Risk,Immediate maintenance intervention recommended.
+36,19,25.102518,24.763935208391928,Critical,High Risk,Immediate maintenance intervention recommended.
+37,21,27.080696,56.27531573198077,Critical,High Risk,Immediate maintenance intervention recommended.
+38,50,67.139656,49.49497567197243,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+39,125,125.0,118.39075949028175,Healthy,Low Risk,Continue normal operation.
+40,28,31.691422,30.500506650075017,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+41,18,19.09709,67.68622643457324,Critical,High Risk,Immediate maintenance intervention recommended.
+42,10,9.259927,19.38524297952105,Critical,High Risk,Immediate maintenance intervention recommended.
+43,59,82.15962,69.58218099554375,Healthy,Low Risk,Continue normal operation.
+44,109,104.16693,107.61130133345911,Healthy,Low Risk,Continue normal operation.
+45,114,82.12779,77.87668337874489,Healthy,Low Risk,Continue normal operation.
+46,47,42.65732,52.019080663528825,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+47,125,111.67708,111.34823653656352,Healthy,Low Risk,Continue normal operation.
+48,92,112.80913,107.92041188957776,Healthy,Low Risk,Continue normal operation.
+49,21,18.26826,14.489170106047741,Critical,High Risk,Immediate maintenance intervention recommended.
+50,79,99.78373,104.841764502412,Healthy,Low Risk,Continue normal operation.
+51,114,112.13019,111.72540945509556,Healthy,Low Risk,Continue normal operation.
+52,29,33.111954,31.34962549025024,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+53,26,29.361797,33.09022213290346,Critical,High Risk,Immediate maintenance intervention recommended.
+54,97,111.7202,121.0111458165781,Healthy,Low Risk,Continue normal operation.
+55,125,118.22941,112.91269907033568,Healthy,Low Risk,Continue normal operation.
+56,15,13.978802,14.49451482067432,Critical,High Risk,Immediate maintenance intervention recommended.
+57,103,111.034966,99.30491812617849,Healthy,Low Risk,Continue normal operation.
+58,37,54.408264,50.84350158094807,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+59,114,109.12872,118.4139353836729,Healthy,Low Risk,Continue normal operation.
+60,100,109.90641,109.87911580894568,Healthy,Low Risk,Continue normal operation.
+61,21,20.95927,45.456523463936506,Critical,High Risk,Immediate maintenance intervention recommended.
+62,54,41.740517,54.891157980739486,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+63,72,101.07774,64.95422456388303,Healthy,Low Risk,Continue normal operation.
+64,28,26.798927,49.240863315889456,Critical,High Risk,Immediate maintenance intervention recommended.
+65,125,122.91681,121.92315276044478,Healthy,Low Risk,Continue normal operation.
+66,14,26.18472,16.289490948473208,Critical,High Risk,Immediate maintenance intervention recommended.
+67,77,120.66202,112.55565470897862,Healthy,Low Risk,Continue normal operation.
+68,8,7.5357795,17.986773120818153,Critical,High Risk,Immediate maintenance intervention recommended.
+69,121,120.67738,113.61024294887277,Healthy,Low Risk,Continue normal operation.
+70,94,102.84912,107.15919585012279,Healthy,Low Risk,Continue normal operation.
+71,118,110.474075,110.37348253163897,Healthy,Low Risk,Continue normal operation.
+72,50,74.673805,74.51541633380127,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+73,125,112.5939,117.79659824919858,Healthy,Low Risk,Continue normal operation.
+74,125,110.72573,99.92922412259708,Healthy,Low Risk,Continue normal operation.
+75,113,113.89487,116.07527846887164,Healthy,Low Risk,Continue normal operation.
+76,10,5.646995,13.867944304728214,Critical,High Risk,Immediate maintenance intervention recommended.
+77,34,33.150837,34.90354086599452,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+78,107,125.0,122.6890697979802,Healthy,Low Risk,Continue normal operation.
+79,63,110.6949,109.37185335692371,Healthy,Low Risk,Continue normal operation.
+80,90,104.47321,83.72066500767396,Healthy,Low Risk,Continue normal operation.
+81,8,9.421137,7.605345344453714,Critical,High Risk,Immediate maintenance intervention recommended.
+82,9,12.662822,9.069338932688298,Critical,High Risk,Immediate maintenance intervention recommended.
+83,125,125.0,110.00947163944832,Healthy,Low Risk,Continue normal operation.
+84,58,82.276215,54.21456073028482,Healthy,Low Risk,Continue normal operation.
+85,118,125.0,108.87854255992559,Healthy,Low Risk,Continue normal operation.
+86,89,119.72302,83.1866776087622,Healthy,Low Risk,Continue normal operation.
+87,116,118.33566,112.9595863385908,Healthy,Low Risk,Continue normal operation.
+88,115,114.248604,114.1104887809433,Healthy,Low Risk,Continue normal operation.
+89,125,118.78942,108.46274573159427,Healthy,Low Risk,Continue normal operation.
+90,28,31.056929,39.064200314412254,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+91,38,22.15829,33.73896995603649,Critical,High Risk,Immediate maintenance intervention recommended.
+92,20,24.737705,23.902318520013704,Critical,High Risk,Immediate maintenance intervention recommended.
+93,85,56.10458,47.99117174716747,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+94,55,81.85306,48.22540362516503,Healthy,Low Risk,Continue normal operation.
+95,125,111.64957,114.63650271532074,Healthy,Low Risk,Continue normal operation.
+96,125,106.64567,122.39359666165133,Healthy,Low Risk,Continue normal operation.
+97,82,93.214714,78.86646860946504,Healthy,Low Risk,Continue normal operation.
+98,59,79.43559,89.70949596246108,Warning,Medium Risk,Schedule inspection and monitor degradation trend.
+99,117,118.82986,120.87227398528832,Healthy,Low Risk,Continue normal operation.
+100,20,20.87355,17.540185534975727,Critical,High Risk,Immediate maintenance intervention recommended.

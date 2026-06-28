@@ -4,7 +4,3 @@ __pycache__/
 .ipynb_checkpoints/
 .env
 .DS_Store
-
-# Large/model artefacts can stay local unless you want them in GitHub
-# models/*.keras
-# models/*.pkl
