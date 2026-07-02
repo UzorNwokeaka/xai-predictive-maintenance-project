@@ -2,186 +2,210 @@ import streamlit as st
 import plotly.express as px
 
 from config import APP_TITLE
+from utils.layout import render_page, end_page
+from utils.helpers import section_title
 from utils.data_loader import load_dashboard_data
+
 
 st.set_page_config(
     page_title=f"Fleet Health | {APP_TITLE}",
-    layout="wide"
+    layout="wide",
 )
 
-st.title("Fleet Health Monitoring Dashboard")
+render_page(
+    "Fleet Health Dashboard",
+    "Monitor fleet condition and maintenance priorities using AI predictions."
+)
 
-st.markdown("""
-This dashboard provides a fleet-wide overview of engine health,
-predicted Remaining Useful Life (RUL), maintenance priority,
-and recommended maintenance actions.
-""")
+dashboard_df = load_dashboard_data()
 
-df = load_dashboard_data()
 
 # ==========================================================
-# Fleet Summary
+# 1. Fleet Overview
 # ==========================================================
 
-healthy = (df["health_status"] == "Healthy").sum()
-warning = (df["health_status"] == "Warning").sum()
-critical = (df["health_status"] == "Critical").sum()
+section_title("1. Fleet Overview")
 
-col1, col2, col3, col4 = st.columns(4)
+total_engines = dashboard_df["engine_id"].nunique()
 
-col1.metric(
-    "Total Engines",
-    df["engine_id"].nunique()
-)
+healthy = (
+    dashboard_df["health_status"] == "Healthy"
+).sum()
 
-col2.metric(
-    "Healthy",
-    healthy
-)
+warning = (
+    dashboard_df["health_status"] == "Warning"
+).sum()
 
-col3.metric(
-    "Warning",
-    warning
-)
+critical = (
+    dashboard_df["health_status"] == "Critical"
+).sum()
 
-col4.metric(
-    "Critical",
-    critical
-)
+avg_rul = dashboard_df["predicted_rul_lstm"].mean()
+
+c1, c2, c3, c4 = st.columns(4)
+
+c1.metric("Total Engines", total_engines)
+c2.metric("Healthy", healthy)
+c3.metric("Warning", warning)
+c4.metric("Critical", critical)
 
 st.metric(
-    "Average Remaining Useful Life (RUL)",
-    f"{df['predicted_rul_lstm'].mean():.2f} cycles"
+    "Average Predicted Remaining Useful Life",
+    f"{avg_rul:.2f} cycles",
 )
 
 st.divider()
 
-# ==========================================================
-# Fleet Health Distribution
-# ==========================================================
-
-left, right = st.columns(2)
-
-with left:
-
-    health_counts = (
-        df["health_status"]
-        .value_counts()
-        .reset_index()
-    )
-
-    health_counts.columns = [
-        "Health Status",
-        "Count"
-    ]
-
-    fig_health = px.pie(
-        health_counts,
-        names="Health Status",
-        values="Count",
-        hole=0.45,
-        title="Fleet Health Distribution"
-    )
-
-    st.plotly_chart(
-        fig_health,
-        use_container_width=True
-    )
-
-with right:
-
-    risk_counts = (
-        df["risk_level"]
-        .value_counts()
-        .reset_index()
-    )
-
-    risk_counts.columns = [
-        "Risk Level",
-        "Count"
-    ]
-
-    fig_risk = px.bar(
-        risk_counts,
-        x="Risk Level",
-        y="Count",
-        color="Risk Level",
-        text="Count",
-        title="Fleet Risk Distribution"
-    )
-
-    fig_risk.update_traces(
-        textposition="outside"
-    )
-
-    st.plotly_chart(
-        fig_risk,
-        use_container_width=True
-    )
-
-st.divider()
 
 # ==========================================================
-# Remaining Useful Life Distribution
+# 2. Fleet Health Distribution
 # ==========================================================
 
-fig_hist = px.histogram(
-    df,
-    x="predicted_rul_lstm",
-    nbins=25,
-    title="Distribution of Predicted Remaining Useful Life"
+section_title("2. Fleet Health Distribution")
+
+health_counts = (
+    dashboard_df["health_status"]
+    .value_counts()
+    .reset_index()
+)
+
+health_counts.columns = [
+    "Health Status",
+    "Count",
+]
+
+fig_health = px.pie(
+    health_counts,
+    names="Health Status",
+    values="Count",
+    hole=0.55,
+    title="Fleet Health Classification",
+    color="Health Status",
+    color_discrete_map={
+        "Healthy": "#2E8B57",     # Green
+        "Warning": "#87CEFA",     # Light Blue
+        "Critical": "#DC143C"     # Crimson Red
+    },
 )
 
 st.plotly_chart(
-    fig_hist,
-    use_container_width=True
+    fig_health,
+    use_container_width=True,
+)
+
+st.divider()
+
+
+# ==========================================================
+# 3. Remaining Useful Life Distribution
+# ==========================================================
+
+section_title("3. Remaining Useful Life Distribution")
+
+fig_rul = px.histogram(
+    dashboard_df,
+    x="predicted_rul_lstm",
+    nbins=20,
+    title="Distribution of Predicted Remaining Useful Life",
+)
+
+fig_rul.update_layout(
+    xaxis_title="Predicted Remaining Useful Life (Cycles)",
+    yaxis_title="Number of Engines",
+)
+
+st.plotly_chart(
+    fig_rul,
+    use_container_width=True,
+)
+
+st.divider()
+
+
+# ==========================================================
+# 4. Engines Requiring Immediate Attention
+# ==========================================================
+
+section_title("4. Engines Requiring Immediate Attention")
+
+priority_df = dashboard_df.sort_values(
+    "predicted_rul_lstm"
+).head(10)
+
+st.dataframe(
+    priority_df[
+        [
+            "engine_id",
+            "predicted_rul_lstm",
+            "health_status",
+            "risk_level",
+            "recommendation",
+        ]
+    ],
+    use_container_width=True,
+)
+
+st.divider()
+
+
+# ==========================================================
+# 5. Fleet Summary
+# ==========================================================
+
+section_title("5. Fleet Summary")
+
+critical_pct = (critical / total_engines) * 100
+warning_pct = (warning / total_engines) * 100
+healthy_pct = (healthy / total_engines) * 100
+
+st.info(
+    f"""
+### Engineering Interpretation
+
+The AI system analysed **{total_engines} engines** within the fleet.
+
+- **Healthy:** {healthy} engines ({healthy_pct:.1f}%)
+- **Warning:** {warning} engines ({warning_pct:.1f}%)
+- **Critical:** {critical} engines ({critical_pct:.1f}%)
+
+The histogram illustrates the distribution of Remaining Useful Life predictions,
+while the priority table highlights the engines requiring the earliest maintenance
+intervention.
+
+This dashboard enables maintenance managers to prioritise inspection,
+maintenance scheduling and operational planning using AI-assisted decision support.
+"""
 )
 
 st.divider()
 
 # ==========================================================
-# Maintenance Priority List
+# 6. Prediction Summary for All Engines
 # ==========================================================
 
-st.subheader("Highest Maintenance Priority")
+section_title("6. Prediction Summary for All Engines")
 
-priority_df = (
-    df.sort_values("predicted_rul_lstm")
-    .head(10)
-)
-
-priority_df = priority_df[
+all_engines_df = dashboard_df[
     [
         "engine_id",
         "predicted_rul_lstm",
         "health_status",
         "risk_level",
-        "recommendation"
+        "recommendation",
     ]
-]
+].sort_values("predicted_rul_lstm")
 
-priority_df.columns = [
+all_engines_df.columns = [
     "Engine ID",
     "Predicted RUL",
-    "Health",
-    "Risk",
-    "Recommended Action"
+    "Health Status",
+    "Risk Level",
+    "Recommendation",
 ]
 
 st.dataframe(
-    priority_df,
-    use_container_width=True
+    all_engines_df,
+    use_container_width=True,
 )
 
-st.divider()
-
-# ==========================================================
-# Fleet Prediction Table
-# ==========================================================
-
-st.subheader("Complete Fleet Predictions")
-
-st.dataframe(
-    df.sort_values("predicted_rul_lstm"),
-    use_container_width=True
-)
+end_page()

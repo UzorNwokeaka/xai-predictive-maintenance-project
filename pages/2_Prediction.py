@@ -1,6 +1,8 @@
 import streamlit as st
 
 from config import APP_TITLE
+from utils.layout import render_page, end_page
+from utils.helpers import section_title
 from utils.data_loader import (
     load_lstm_model,
     load_scaler,
@@ -15,28 +17,25 @@ st.set_page_config(
     layout="wide",
 )
 
-
-def clear_prediction_page():
-    st.session_state.prediction_completed = False
-    st.session_state.input_reset_counter += 1
-
-
-st.title("AI Predictive Maintenance Decision Support")
-
-st.markdown(
-    """
-    Provide the engine operational settings and sensor measurements below.
-    The trained LSTM model will estimate the Remaining Useful Life (RUL)
-    and generate a maintenance recommendation.
-    """
+render_page(
+    "AI Predictive Maintenance Decision Support",
+    "Predict Remaining Useful Life, understand AI outputs and support maintenance planning."
 )
 
+
+# ==========================================================
+# Load AI Artefacts
+# ==========================================================
 
 lstm_model = load_lstm_model()
 scaler = load_scaler()
 selected_features = load_selected_features()
 feature_importance = load_feature_importance()
 
+
+# ==========================================================
+# Reset Logic
+# ==========================================================
 
 if "prediction_completed" not in st.session_state:
     st.session_state.prediction_completed = False
@@ -45,26 +44,41 @@ if "input_reset_counter" not in st.session_state:
     st.session_state.input_reset_counter = 0
 
 
+def clear_prediction_page():
+    st.session_state.prediction_completed = False
+    st.session_state.input_reset_counter += 1
+
+
 reset_id = st.session_state.input_reset_counter
 
 
-st.subheader("Operational Settings")
+# ==========================================================
+# 1. Operational Settings
+# ==========================================================
+
+section_title("1. Operational Settings")
 
 settings = {}
-setting_names = ["setting_1", "setting_2", "setting_3"]
+
 setting_cols = st.columns(3)
 
-for i, setting in enumerate(setting_names):
-    with setting_cols[i]:
+setting_names = ["setting_1", "setting_2", "setting_3"]
+
+for idx, setting in enumerate(setting_names):
+    with setting_cols[idx]:
         settings[setting] = st.number_input(
-            label=setting.replace("_", " ").title(),
+            setting.replace("_", " ").title(),
             value=0.0,
-            step=0.01,
+            format="%.3f",
             key=f"input_{setting}_{reset_id}",
         )
 
 
-st.subheader("Sensor Measurements")
+# ==========================================================
+# 2. Sensor Measurements
+# ==========================================================
+
+section_title("2. Sensor Measurements")
 
 sensor_inputs = {}
 
@@ -73,31 +87,37 @@ sensor_features = [
     if feature.startswith("sensor")
 ]
 
-sensor_cols = st.columns(3)
+left, right = st.columns(2)
 
-for i, sensor in enumerate(sensor_features):
-    with sensor_cols[i % 3]:
+for idx, sensor in enumerate(sensor_features):
+    target_col = left if idx < 7 else right
+
+    with target_col:
         sensor_inputs[sensor] = st.number_input(
-            label=sensor.replace("_", " ").title(),
+            sensor.replace("_", " ").title(),
             value=0.0,
-            step=0.01,
+            format="%.3f",
             key=f"input_{sensor}_{reset_id}",
         )
 
 
-st.divider()
+# ==========================================================
+# 3. AI Inference
+# ==========================================================
 
-clear_col, predict_col = st.columns([1, 2])
+section_title("3. AI Inference")
 
-with clear_col:
-    clear_clicked = st.button(
-        "Clear All",
-        use_container_width=True,
-    )
+predict_col, clear_col = st.columns(2)
 
 with predict_col:
     predict_clicked = st.button(
         "Predict Remaining Useful Life",
+        use_container_width=True,
+    )
+
+with clear_col:
+    clear_clicked = st.button(
+        "Clear Inputs",
         use_container_width=True,
     )
 
@@ -123,19 +143,23 @@ if predict_clicked:
         selected_features=selected_features,
     )
 
-    results = generate_decision_output(predicted_rul)
+    decision = generate_decision_output(predicted_rul)
 
     st.session_state.prediction_completed = True
-    st.session_state.prediction_rul = results["predicted_rul"]
-    st.session_state.prediction_health_status = results["health_status"]
-    st.session_state.prediction_risk_level = results["risk_level"]
-    st.session_state.prediction_recommendation = results["recommendation"]
+    st.session_state.prediction_rul = decision["predicted_rul"]
+    st.session_state.prediction_health_status = decision["health_status"]
+    st.session_state.prediction_risk_level = decision["risk_level"]
+    st.session_state.prediction_recommendation = decision["recommendation"]
 
+
+# ==========================================================
+# 4. AI Prediction Summary
+# ==========================================================
 
 if st.session_state.prediction_completed:
     st.divider()
 
-    st.subheader("Prediction Results")
+    section_title("4. AI Prediction Summary")
 
     c1, c2, c3 = st.columns(3)
 
@@ -154,27 +178,58 @@ if st.session_state.prediction_completed:
         st.session_state.prediction_risk_level,
     )
 
-    st.success(st.session_state.prediction_recommendation)
 
-    st.subheader("Decision Summary")
+    # ======================================================
+    # 5. Maintenance Recommendation
+    # ======================================================
 
-    st.info(
+    section_title("5. Maintenance Recommendation")
+
+    st.info(st.session_state.prediction_recommendation)
+
+    st.markdown(
         f"""
         The trained LSTM model predicts that this engine has approximately
-        **{st.session_state.prediction_rul:.2f} operational cycles** remaining
-        before failure.
+        **{st.session_state.prediction_rul:.2f} operational cycles** remaining.
 
-        Based on this prediction, the engine is classified as
-        **{st.session_state.prediction_health_status}** with an overall
-        **{st.session_state.prediction_risk_level}**.
+        Based on this output, the engine is classified as
+        **{st.session_state.prediction_health_status}** with a
+        **{st.session_state.prediction_risk_level}** level.
 
-        Recommended action: **{st.session_state.prediction_recommendation}**
+        The recommendation above translates the model output into an actionable
+        maintenance decision-support statement.
         """
     )
 
-    st.subheader("Top Five Influential Features")
+
+    # ======================================================
+    # 6. Explainability Reference
+    # ======================================================
+
+    section_title("6. Explainability Reference")
+
+    st.markdown(
+        """
+        The final predictive model is the **Improved LSTM**.  
+        The explainability reference model is the **Tuned Random Forest**, which
+        provides global feature-importance insights for the decision-support layer.
+        """
+    )
 
     st.dataframe(
         feature_importance.head(5),
         use_container_width=True,
     )
+
+else:
+    st.divider()
+    st.info(
+        """
+        Enter operational settings and sensor measurements, then click
+        **Predict Remaining Useful Life** to generate a prediction and
+        maintenance recommendation.
+        """
+    )
+
+
+end_page()

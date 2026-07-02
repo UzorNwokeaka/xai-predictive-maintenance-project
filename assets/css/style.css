@@ -1,0 +1,28 @@
+.main-title{
+    font-size:32px;
+    font-weight:700;
+    color:#0F4C81;
+    margin-bottom:0.3rem;
+}
+
+.page-subtitle{
+    font-size:17px;
+    color:#444444;
+    margin-bottom:1.2rem;
+}
+
+.section-title{
+    font-size:22px;
+    font-weight:600;
+    color:#0F4C81;
+    margin-top:1rem;
+    margin-bottom:0.6rem;
+}
+
+.footer{
+    margin-top:40px;
+    border-top:1px solid #DDDDDD;
+    padding-top:12px;
+    color:#666666;
+    font-size:13px;
+}

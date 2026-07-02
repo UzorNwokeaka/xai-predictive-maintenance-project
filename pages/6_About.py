@@ -1,92 +1,191 @@
 import streamlit as st
 
 from config import APP_TITLE
+from utils.layout import render_page, end_page
+from utils.helpers import section_title
 from utils.data_loader import load_model_metadata
 
 
-st.set_page_config(page_title=f"About | {APP_TITLE}", layout="wide")
+st.set_page_config(
+    page_title=f"About | {APP_TITLE}",
+    layout="wide",
+)
 
-st.title("About This Research Project")
+render_page(
+    "About This Project",
+    "Project overview, methodology and research contribution."
+)
 
 metadata = load_model_metadata()
 
-st.subheader("Dissertation Title")
+
+# ==========================================================
+# 1. Project Overview
+# ==========================================================
+
+section_title("1. Project Overview")
 
 st.markdown(
     """
-    **Explainable AI for Human-Centric Predictive Maintenance Using Industrial IoT Sensor Data:
-    A Case Study of Remaining Useful Life Prediction in NASA Turbofan Engines**
-    """
+This application was developed as part of an MSc dissertation in Data Science
+and Artificial Intelligence at the University of Suffolk.
+
+The project investigates how Explainable Artificial Intelligence (XAI) can
+support human-centred predictive maintenance for industrial assets using
+NASA C-MAPSS turbofan engine sensor data.
+
+The deployed system combines deep learning prediction,
+health-state classification and explainability to support maintenance
+decision-making.
+"""
 )
 
-st.subheader("Research Aim")
+st.divider()
+
+
+# ==========================================================
+# 2. Research Information
+# ==========================================================
+
+section_title("2. Research Information")
+
+left, right = st.columns(2)
+
+with left:
+
+    st.metric(
+        "Dataset",
+        metadata.get("dataset", "NASA C-MAPSS FD001")
+    )
+
+    st.metric(
+        "Predictive Model",
+        metadata.get("best_model", "Improved LSTM")
+    )
+
+    st.metric(
+        "Explainability",
+        metadata.get(
+            "explainability_model",
+            "Random Forest Tuned"
+        )
+    )
+
+with right:
+
+    st.metric(
+        "Window Size",
+        metadata.get("window_size", 30)
+    )
+
+    st.metric(
+        "Feature Count",
+        metadata.get("feature_count", 17)
+    )
+
+    st.metric(
+        "Deployment",
+        metadata.get(
+            "deployment_platform",
+            "Streamlit"
+        )
+    )
+
+st.divider()
+
+
+# ==========================================================
+# 3. Decision Support Workflow
+# ==========================================================
+
+section_title("3. Decision Support Workflow")
+
+workflow = st.columns(6)
+
+steps = [
+    "Industrial IoT",
+    "Data Preparation",
+    "Prediction",
+    "Explainability",
+    "Health Classification",
+    "Decision Support",
+]
+
+for col, step in zip(workflow, steps):
+    with col:
+        st.markdown(f"**{step}**")
 
 st.markdown(
     """
-    The aim of this project is to design, implement and evaluate an Explainable AI
-    framework that predicts Remaining Useful Life, provides interpretable insights,
-    and supports human-centred predictive maintenance decision-making within an
-    Industry 5.0 context.
-    """
+The application follows a structured workflow that transforms multivariate
+sensor measurements into Remaining Useful Life predictions,
+health classifications and maintenance recommendations.
+"""
 )
 
-st.subheader("Dataset")
+st.divider()
 
-st.markdown(
-    f"""
-    The project uses the **{metadata.get("dataset", "NASA C-MAPSS FD001")}**
-    dataset. The dataset contains multivariate turbofan engine sensor readings
-    recorded over operational cycles. It is widely used for Remaining Useful Life
-    prediction and predictive maintenance research.
-    """
-)
 
-st.subheader("Final Model Configuration")
+# ==========================================================
+# 4. Research Contribution
+# ==========================================================
 
-col1, col2, col3 = st.columns(3)
-
-col1.metric("Best Model", metadata.get("best_model", "Improved LSTM"))
-col2.metric("Window Size", metadata.get("window_size", 30))
-col3.metric("RUL Cap", metadata.get("rul_cap", 125))
-
-col4, col5, col6 = st.columns(3)
-
-col4.metric("RMSE", round(float(metadata.get("rmse", 0)), 2))
-col5.metric("MAE", round(float(metadata.get("mae", 0)), 2))
-col6.metric("R²", round(float(metadata.get("r2", 0)), 3))
-
-st.subheader("Technology Stack")
+section_title("4. Research Contribution")
 
 st.markdown(
     """
-    - Python
-    - Pandas and NumPy
-    - Scikit-learn
-    - XGBoost
-    - TensorFlow/Keras
-    - SHAP / feature importance analysis
-    - Streamlit
-    - Plotly
-    - Git and GitHub
-    """
+The principal contributions of this research include:
+
+- Development of a deep learning model for Remaining Useful Life prediction.
+- Comparative evaluation of machine learning and deep learning approaches.
+- Integration of Explainable AI techniques into predictive maintenance.
+- Translation of AI predictions into health status and maintenance recommendations.
+- Development of an interactive decision-support dashboard.
+"""
 )
 
-st.subheader("Industry 5.0 Alignment")
+st.divider()
+
+
+# ==========================================================
+# 5. Technologies
+# ==========================================================
+
+section_title("5. Technology Stacks")
 
 st.markdown(
-    """
-    The system aligns with Industry 5.0 by emphasising human-centred decision support.
-    The AI model provides predictions and explanations, while maintenance engineers
-    remain responsible for interpreting outputs and making final operational decisions.
-    """
+"""
+- Python
+- TensorFlow / Keras
+- Scikit-learn
+- XGBoost
+- SHAP
+- Plotly
+- Streamlit
+- Pandas
+- NumPy
+"""
 )
 
-st.subheader("System Purpose")
+st.divider()
 
-st.success(
-    """
-    This application demonstrates how predictive modelling, explainability and
-    maintenance recommendations can be integrated into a practical decision-support
-    system for intelligent manufacturing and predictive maintenance environments.
-    """
+
+# ==========================================================
+# 6. Disclaimer
+# ==========================================================
+
+section_title("6. Disclaimer")
+
+st.info(
+"""
+This application was developed for academic research purposes.
+
+Predictions and recommendations are intended to support
+maintenance engineers and decision-makers.
+
+Final operational decisions should always remain under
+human supervision.
+"""
 )
+
+end_page()
