@@ -1,0 +1,16 @@
+{
+    "engine_id": 41,
+    "actual_rul": 18.0,
+    "predicted_rul": 20.299083709716797,
+    "health_status": "Critical",
+    "critical_start_cycle": 112,
+    "critical_end_cycle": 121,
+    "timeshap_success": true,
+    "timeshap_error": null,
+    "timeshap_runtime_seconds": 10.398717700999441,
+    "integrated_gradients_runtime_seconds": 5.364319246999912,
+    "feature_rank_spearman": 0.9779411764705883,
+    "top_five_feature_overlap": 0.8,
+    "ig_baseline_rank_spearman": 0.232843137254902,
+    "provisional_xai_decision": "TimeSHAP primary; Integrated Gradients supplementary"
+}

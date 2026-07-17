@@ -1,0 +1,9 @@
+criterion,TimeSHAP,Integrated Gradients
+Directly explains Improved LSTM,Yes,Yes
+Feature attribution,Yes,Yes
+Event/timestep attribution,Yes,Yes
+Temporal coalition pruning,Yes,No
+Complete sensor-time heatmap,Optional cell-level method,Yes
+Runtime,10.40 seconds,5.36 seconds
+Mean deletion prediction change,61.8286,62.8959
+Alignment with sequence-XAI literature,Strong,Moderate

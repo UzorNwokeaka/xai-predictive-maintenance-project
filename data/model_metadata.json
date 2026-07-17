@@ -3,17 +3,17 @@
     "dataset": "NASA C-MAPSS FD001",
     "best_model": "Improved LSTM",
     "model_type": "Deep Learning",
-    "rmse": 15.322921,
-    "mae": 11.298936,
-    "r2": 0.853791,
+    "rmse": 14.546558,
+    "mae": 10.817222,
+    "r2": 0.868232,
     "window_size": 30,
     "rul_cap": 125,
     "feature_count": 17,
     "operational_settings": 3,
     "sensor_measurements": 14,
-    "training_date": "2026-06-28",
+    "training_date": "2026-07-14",
     "tensorflow_version": "2.21.0",
     "deployment_platform": "Streamlit",
-    "explainability_model": "Random Forest Tuned",
-    "application_version": "1.0"
+    "explainability_model": "Improved LSTM with TimeSHAP",
+    "application_version": "1.1"
 }

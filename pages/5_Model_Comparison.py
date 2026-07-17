@@ -4,8 +4,15 @@ import plotly.express as px
 from config import APP_TITLE
 from utils.layout import render_page, end_page
 from utils.helpers import section_title
-from utils.data_loader import load_model_comparison, load_model_metadata
+from utils.data_loader import (
+    load_model_comparison,
+    load_model_metadata,
+)
 
+
+# ==========================================================
+# Page Configuration
+# ==========================================================
 
 st.set_page_config(
     page_title=f"Model Comparison | {APP_TITLE}",
@@ -14,10 +21,24 @@ st.set_page_config(
 
 render_page(
     "Model Performance Comparison",
-    "Evaluate why the Improved LSTM was selected as the final predictive model."
+    (
+        "Compare the evaluated machine learning and deep learning "
+        "models and review why the Improved LSTM was selected as "
+        "the final predictive model."
+    ),
 )
 
-model_df = load_model_comparison().sort_values("RMSE")
+
+# ==========================================================
+# Load Evaluation Results
+# ==========================================================
+
+model_df = (
+    load_model_comparison()
+    .sort_values("RMSE")
+    .reset_index(drop=True)
+)
+
 metadata = load_model_metadata()
 
 best_model = model_df.iloc[0]
@@ -31,20 +52,37 @@ section_title("1. Best Model Summary")
 
 c1, c2, c3, c4 = st.columns(4)
 
-c1.metric("Best Model", best_model["Model"])
-c2.metric("RMSE", f"{best_model['RMSE']:.2f}")
-c3.metric("MAE", f"{best_model['MAE']:.2f}")
-c4.metric("R²", f"{best_model['R2']:.3f}")
+c1.metric(
+    "Best Model",
+    best_model["Model"],
+)
+
+c2.metric(
+    "RMSE",
+    f"{best_model['RMSE']:.2f} cycles",
+)
+
+c3.metric(
+    "MAE",
+    f"{best_model['MAE']:.2f} cycles",
+)
+
+c4.metric(
+    "R²",
+    f"{best_model['R2']:.3f}",
+)
 
 st.info(
     f"""
-    The best-performing model is **{best_model['Model']}**, achieving an RMSE of
-    **{best_model['RMSE']:.2f} cycles**, MAE of **{best_model['MAE']:.2f} cycles**
-    and R² of **{best_model['R2']:.3f}**.
+    The **{best_model['Model']}** achieved the best predictive
+    performance, with an RMSE of **{best_model['RMSE']:.2f} cycles**,
+    an MAE of **{best_model['MAE']:.2f} cycles**, and an R² score of
+    **{best_model['R2']:.3f}**.
 
-    This indicates that the final model provides the strongest predictive
-    performance among the evaluated traditional machine learning and deep learning
-    approaches.
+    These results demonstrate the advantage of sequence-based deep
+    learning for modelling temporal degradation in turbofan engines.
+    Consequently, the Improved LSTM was selected as the deployed
+    predictive model for the Explainable AI decision-support system.
     """
 )
 
@@ -73,11 +111,21 @@ fig_rmse.update_traces(
 
 fig_rmse.update_layout(
     xaxis_title="Model",
-    yaxis_title="RMSE",
+    yaxis_title="RMSE in cycles",
     xaxis_tickangle=-35,
 )
 
-st.plotly_chart(fig_rmse, use_container_width=True)
+st.plotly_chart(
+    fig_rmse,
+    use_container_width=True,
+)
+
+st.caption(
+    """
+    Lower RMSE values indicate better overall predictive accuracy.
+    The Improved LSTM achieved the lowest RMSE among the evaluated models.
+    """
+)
 
 st.divider()
 
@@ -104,11 +152,21 @@ fig_mae.update_traces(
 
 fig_mae.update_layout(
     xaxis_title="Model",
-    yaxis_title="MAE",
+    yaxis_title="MAE in cycles",
     xaxis_tickangle=-35,
 )
 
-st.plotly_chart(fig_mae, use_container_width=True)
+st.plotly_chart(
+    fig_mae,
+    use_container_width=True,
+)
+
+st.caption(
+    """
+    Lower MAE values indicate smaller average prediction errors.
+    MAE is expressed in operational cycles.
+    """
+)
 
 st.divider()
 
@@ -139,7 +197,17 @@ fig_r2.update_layout(
     xaxis_tickangle=-35,
 )
 
-st.plotly_chart(fig_r2, use_container_width=True)
+st.plotly_chart(
+    fig_r2,
+    use_container_width=True,
+)
+
+st.caption(
+    """
+    Higher R² values indicate that a larger proportion of the variation
+    in Remaining Useful Life is explained by the model.
+    """
+)
 
 st.divider()
 
@@ -150,9 +218,22 @@ st.divider()
 
 section_title("5. Full Experiment Results")
 
+display_columns = [
+    column
+    for column in [
+        "Model",
+        "RMSE",
+        "MAE",
+        "R2",
+        "Experiment_Type",
+    ]
+    if column in model_df.columns
+]
+
 st.dataframe(
-    model_df,
+    model_df[display_columns],
     use_container_width=True,
+    hide_index=True,
 )
 
 st.divider()
@@ -166,21 +247,85 @@ section_title("6. Evaluation Interpretation")
 
 st.markdown(
     f"""
-    The model comparison confirms that **{metadata.get("best_model", "Improved LSTM")}**
-    achieved the strongest overall performance. This supports the use of a recurrent
-    deep learning architecture for modelling temporal degradation patterns in
-    multivariate turbofan sensor data.
+The comparative evaluation demonstrates that
+**{metadata.get("best_model", "Improved LSTM")}**
+achieved the strongest overall predictive performance across the
+evaluated machine learning and deep learning models.
 
-    The tuned Random Forest and XGBoost models also performed competitively,
-    demonstrating that traditional ensemble learning methods remain effective for
-    predictive maintenance tasks. However, the Improved LSTM achieved the lowest
-    prediction error and was therefore selected as the final predictive model for
-    the deployed decision-support system.
+The Improved LSTM produced the lowest overall prediction error while
+capturing temporal degradation patterns present in multivariate
+turbofan sensor sequences. This makes the recurrent architecture
+particularly suitable for Remaining Useful Life prediction in
+Industrial Internet of Things predictive-maintenance applications.
 
-    The tuned Random Forest was retained as the explainable reference model because
-    it provides stable global feature-importance outputs that support transparent
-    interpretation of maintenance-related sensor contributors.
-    """
+Traditional ensemble models, including the Tuned Random Forest and
+Tuned XGBoost, also produced competitive results and provided valuable
+benchmarks against which the deep learning models were evaluated.
+
+The final Explainable AI framework explains the deployed Improved LSTM
+directly. **TimeSHAP** is used as the primary explainability method,
+while **Integrated Gradients** provides supplementary validation of the
+resulting feature and temporal attributions.
+
+Together, the two explanation methods support:
+
+- global feature attribution;
+- local engine-level interpretation;
+- temporal event attribution;
+- critical degradation-window identification;
+- sensor-time attribution;
+- feature-deletion faithfulness analysis.
+
+This combination provides accurate Remaining Useful Life prediction
+together with transparent and human-centred maintenance decision
+support.
+"""
 )
+
+st.divider()
+
+
+# ==========================================================
+# 7. Final Model Selection
+# ==========================================================
+
+section_title("7. Final Model Selection")
+
+selection_col1, selection_col2 = st.columns(2)
+
+with selection_col1:
+    st.success(
+        """
+### Deployed Predictive Model
+
+**Improved LSTM**
+
+The Improved LSTM is the final model used by the application to predict
+Remaining Useful Life from multivariate operational and sensor data.
+
+It was selected because it achieved the strongest overall predictive
+performance among the evaluated models.
+"""
+    )
+
+with selection_col2:
+    st.success(
+        """
+### Explainable AI Framework
+
+**Primary method: TimeSHAP**
+
+**Supplementary method: Integrated Gradients**
+
+Both methods explain the deployed Improved LSTM directly and provide
+complementary feature-level and temporal insights for maintenance
+decision support.
+"""
+    )
+
+
+# ==========================================================
+# Page Footer
+# ==========================================================
 
 end_page()

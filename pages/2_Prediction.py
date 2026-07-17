@@ -1,16 +1,30 @@
 import streamlit as st
 
-from config import APP_TITLE
+from config import (
+    APP_TITLE,
+    PREDICTIVE_MODEL_NAME,
+    PRIMARY_XAI_METHOD,
+    SUPPLEMENTARY_XAI_METHOD,
+)
+
 from utils.layout import render_page, end_page
 from utils.helpers import section_title
+
 from utils.data_loader import (
     load_lstm_model,
     load_scaler,
     load_selected_features,
-    load_feature_importance,
 )
-from utils.prediction import predict_rul, generate_decision_output
 
+from utils.prediction import (
+    predict_rul,
+    generate_decision_output,
+)
+
+
+# ============================================================
+# Page configuration
+# ============================================================
 
 st.set_page_config(
     page_title=f"Prediction | {APP_TITLE}",
@@ -19,23 +33,25 @@ st.set_page_config(
 
 render_page(
     "AI Predictive Maintenance Decision Support",
-    "Predict Remaining Useful Life, understand AI outputs and support maintenance planning."
+    (
+        "Predict Remaining Useful Life and translate the result "
+        "into health status, risk level and maintenance guidance."
+    ),
 )
 
 
-# ==========================================================
-# Load AI Artefacts
-# ==========================================================
+# ============================================================
+# Load deployed model artefacts
+# ============================================================
 
 lstm_model = load_lstm_model()
 scaler = load_scaler()
-selected_features = load_selected_features()
-feature_importance = load_feature_importance()
+selected_features = list(load_selected_features())
 
 
-# ==========================================================
-# Reset Logic
-# ==========================================================
+# ============================================================
+# Session-state and reset logic
+# ============================================================
 
 if "prediction_completed" not in st.session_state:
     st.session_state.prediction_completed = False
@@ -44,78 +60,150 @@ if "input_reset_counter" not in st.session_state:
     st.session_state.input_reset_counter = 0
 
 
-def clear_prediction_page():
+def clear_prediction_page() -> None:
+    """
+    Reset the prediction output and create new widget keys so that
+    all operational-setting and sensor inputs return to zero.
+    """
     st.session_state.prediction_completed = False
     st.session_state.input_reset_counter += 1
+
+    for key in [
+        "prediction_rul",
+        "prediction_health_status",
+        "prediction_risk_level",
+        "prediction_recommendation",
+    ]:
+        st.session_state.pop(key, None)
 
 
 reset_id = st.session_state.input_reset_counter
 
 
-# ==========================================================
-# 1. Operational Settings
-# ==========================================================
+# ============================================================
+# 1. Predictive model overview
+# ============================================================
 
-section_title("1. Operational Settings")
+section_title("1. Predictive Model Overview")
+
+overview_col1, overview_col2, overview_col3 = st.columns(3)
+
+overview_col1.metric(
+    "Deployed Model",
+    PREDICTIVE_MODEL_NAME,
+)
+
+overview_col2.metric(
+    "Input Window",
+    "30 operational cycles",
+)
+
+overview_col3.metric(
+    "Input Variables",
+    f"{len(selected_features)} features",
+)
+
+st.info(
+    """
+    The deployed Improved LSTM was trained using **30-cycle multivariate
+    operational sequences** from the NASA C-MAPSS FD001 dataset.
+
+    During training, the model learned degradation patterns from the
+    historical behaviour of each engine rather than from a single
+    operational cycle. This interface provides a simplified
+    decision-support demonstration of the trained model.
+    """
+)
+
+
+# ============================================================
+# 2. Operational settings
+# ============================================================
+
+section_title("2. Operational Settings")
 
 settings = {}
 
-setting_cols = st.columns(3)
+setting_names = [
+    feature
+    for feature in selected_features
+    if feature.startswith("setting")
+]
 
-setting_names = ["setting_1", "setting_2", "setting_3"]
+setting_columns = st.columns(
+    max(1, len(setting_names))
+)
 
-for idx, setting in enumerate(setting_names):
-    with setting_cols[idx]:
+for index, setting in enumerate(setting_names):
+    with setting_columns[index]:
         settings[setting] = st.number_input(
             setting.replace("_", " ").title(),
             value=0.0,
             format="%.3f",
             key=f"input_{setting}_{reset_id}",
+            help=(
+                "Enter the current value for this operational "
+                "setting."
+            ),
         )
 
 
-# ==========================================================
-# 2. Sensor Measurements
-# ==========================================================
+# ============================================================
+# 3. Sensor measurements
+# ============================================================
 
-section_title("2. Sensor Measurements")
+section_title("3. Sensor Measurements")
 
 sensor_inputs = {}
 
 sensor_features = [
-    feature for feature in selected_features
+    feature
+    for feature in selected_features
     if feature.startswith("sensor")
 ]
 
-left, right = st.columns(2)
+left_column, right_column = st.columns(2)
 
-for idx, sensor in enumerate(sensor_features):
-    target_col = left if idx < 7 else right
+split_index = (
+    len(sensor_features) + 1
+) // 2
 
-    with target_col:
+for index, sensor in enumerate(sensor_features):
+    target_column = (
+        left_column
+        if index < split_index
+        else right_column
+    )
+
+    with target_column:
         sensor_inputs[sensor] = st.number_input(
             sensor.replace("_", " ").title(),
             value=0.0,
             format="%.3f",
             key=f"input_{sensor}_{reset_id}",
+            help=(
+                "Enter the current measurement for this "
+                "selected sensor variable."
+            ),
         )
 
 
-# ==========================================================
-# 3. AI Inference
-# ==========================================================
+# ============================================================
+# 4. AI inference controls
+# ============================================================
 
-section_title("3. AI Inference")
+section_title("4. AI Inference")
 
-predict_col, clear_col = st.columns(2)
+predict_column, clear_column = st.columns(2)
 
-with predict_col:
+with predict_column:
     predict_clicked = st.button(
         "Predict Remaining Useful Life",
         use_container_width=True,
+        type="primary",
     )
 
-with clear_col:
+with clear_column:
     clear_clicked = st.button(
         "Clear Inputs",
         use_container_width=True,
@@ -132,102 +220,200 @@ if predict_clicked:
 
     for feature in selected_features:
         if feature.startswith("setting"):
-            ordered_values.append(settings[feature])
+            ordered_values.append(
+                settings[feature]
+            )
+        elif feature.startswith("sensor"):
+            ordered_values.append(
+                sensor_inputs[feature]
+            )
         else:
-            ordered_values.append(sensor_inputs[feature])
+            st.error(
+                f"Unsupported input feature detected: {feature}"
+            )
+            st.stop()
 
-    predicted_rul = predict_rul(
-        input_values=ordered_values,
-        lstm_model=lstm_model,
-        scaler=scaler,
-        selected_features=selected_features,
-    )
+    try:
+        predicted_rul = predict_rul(
+            input_values=ordered_values,
+            lstm_model=lstm_model,
+            scaler=scaler,
+            selected_features=selected_features,
+        )
 
-    decision = generate_decision_output(predicted_rul)
+        decision = generate_decision_output(
+            predicted_rul
+        )
+
+    except (ValueError, TypeError) as error:
+        st.error(
+            "The prediction could not be completed because "
+            f"the input data were invalid: {error}"
+        )
+        st.stop()
+
+    except Exception as error:
+        st.error(
+            "An unexpected error occurred during model "
+            f"inference: {error}"
+        )
+        st.stop()
 
     st.session_state.prediction_completed = True
-    st.session_state.prediction_rul = decision["predicted_rul"]
-    st.session_state.prediction_health_status = decision["health_status"]
-    st.session_state.prediction_risk_level = decision["risk_level"]
-    st.session_state.prediction_recommendation = decision["recommendation"]
+    st.session_state.prediction_rul = float(
+        decision["predicted_rul"]
+    )
+    st.session_state.prediction_health_status = (
+        decision["health_status"]
+    )
+    st.session_state.prediction_risk_level = (
+        decision["risk_level"]
+    )
+    st.session_state.prediction_recommendation = (
+        decision["recommendation"]
+    )
 
 
-# ==========================================================
-# 4. AI Prediction Summary
-# ==========================================================
+# ============================================================
+# 5. Prediction and decision-support output
+# ============================================================
 
 if st.session_state.prediction_completed:
     st.divider()
 
-    section_title("4. AI Prediction Summary")
-
-    c1, c2, c3 = st.columns(3)
-
-    c1.metric(
-        "Predicted RUL",
-        f"{st.session_state.prediction_rul:.2f} cycles",
+    section_title(
+        "5. Prediction and Health Assessment"
     )
 
-    c2.metric(
+    result_col1, result_col2, result_col3 = (
+        st.columns(3)
+    )
+
+    result_col1.metric(
+        "Predicted RUL",
+        (
+            f"{st.session_state.prediction_rul:.2f} "
+            "cycles"
+        ),
+    )
+
+    result_col2.metric(
         "Health Status",
         st.session_state.prediction_health_status,
     )
 
-    c3.metric(
+    result_col3.metric(
         "Risk Level",
         st.session_state.prediction_risk_level,
     )
 
 
-    # ======================================================
-    # 5. Maintenance Recommendation
-    # ======================================================
+    # ========================================================
+    # 6. Maintenance recommendation
+    # ========================================================
 
-    section_title("5. Maintenance Recommendation")
+    section_title(
+        "6. Maintenance Recommendation"
+    )
 
-    st.info(st.session_state.prediction_recommendation)
+    recommendation = (
+        st.session_state.prediction_recommendation
+    )
+
+    risk_level = (
+        st.session_state.prediction_risk_level
+    )
+
+    if risk_level == "High Risk":
+        st.error(recommendation)
+
+    elif risk_level == "Medium Risk":
+        st.warning(recommendation)
+
+    else:
+        st.success(recommendation)
 
     st.markdown(
         f"""
-        The trained LSTM model predicts that this engine has approximately
-        **{st.session_state.prediction_rul:.2f} operational cycles** remaining.
+        The **{PREDICTIVE_MODEL_NAME}** estimates that the
+        engine has approximately
+        **{st.session_state.prediction_rul:.2f} operational
+        cycles** remaining.
 
-        Based on this output, the engine is classified as
-        **{st.session_state.prediction_health_status}** with a
-        **{st.session_state.prediction_risk_level}** level.
+        This output corresponds to a
+        **{st.session_state.prediction_health_status}**
+        health classification and a
+        **{st.session_state.prediction_risk_level}**
+        risk level.
 
-        The recommendation above translates the model output into an actionable
-        maintenance decision-support statement.
+        The recommendation converts the numerical prediction
+        into an operational decision-support statement. Final
+        maintenance action should remain subject to engineering
+        inspection, operational context and organisational
+        maintenance procedures.
         """
     )
 
 
-    # ======================================================
-    # 6. Explainability Reference
-    # ======================================================
+    # ========================================================
+    # 7. Explainability reference
+    # ========================================================
 
-    section_title("6. Explainability Reference")
-
-    st.markdown(
-        """
-        The final predictive model is the **Improved LSTM**.  
-        The explainability reference model is the **Tuned Random Forest**, which
-        provides global feature-importance insights for the decision-support layer.
-        """
+    section_title(
+        "7. Explainability Reference"
     )
 
-    st.dataframe(
-        feature_importance.head(5),
-        use_container_width=True,
+    xai_col1, xai_col2 = st.columns(2)
+
+    with xai_col1:
+        st.metric(
+            "Primary XAI Method",
+            PRIMARY_XAI_METHOD,
+        )
+
+        st.markdown(
+            """
+            TimeSHAP provides sequence-aware feature, event
+            and temporal-coalition explanations directly for
+            the Improved LSTM.
+            """
+        )
+
+    with xai_col2:
+        st.metric(
+            "Supplementary XAI Method",
+            SUPPLEMENTARY_XAI_METHOD,
+        )
+
+        st.markdown(
+            """
+            Integrated Gradients provides independent feature,
+            timestep and sensor-time attribution used to
+            validate the TimeSHAP findings.
+            """
+        )
+
+    st.info(
+        """
+        The deployed application displays validated explanation
+        artefacts generated during the Kaggle experimental phase.
+
+        Open the **Explainability** module to review feature
+        attribution, event attribution, coalition pruning,
+        sensor-time heatmaps, deletion faithfulness and the
+        critical degradation window.
+        """
     )
 
 else:
     st.divider()
+
     st.info(
         """
-        Enter operational settings and sensor measurements, then click
-        **Predict Remaining Useful Life** to generate a prediction and
-        maintenance recommendation.
+        Enter the operational settings and selected sensor
+        measurements, then select **Predict Remaining Useful
+        Life** to generate an RUL prediction, health assessment
+        and maintenance recommendation.
         """
     )
 

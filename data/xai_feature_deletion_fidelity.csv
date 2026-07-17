@@ -1,0 +1,7 @@
+method,fraction_masked,number_masked,masked_features,original_prediction,masked_prediction,absolute_prediction_change
+TimeSHAP,0.1,2,"sensor_11, sensor_4",20.299083709716797,41.078330993652344,20.779247283935547
+TimeSHAP,0.25,4,"sensor_11, sensor_4, sensor_7, sensor_15",20.299083709716797,81.65705108642578,61.357967376708984
+TimeSHAP,0.5,8,"sensor_11, sensor_4, sensor_7, sensor_15, sensor_13, sensor_20, sensor_17, sensor_21",20.299083709716797,123.64769744873047,103.34861373901367
+Integrated Gradients,0.1,2,"sensor_11, sensor_4",20.299083709716797,41.078330993652344,20.779247283935547
+Integrated Gradients,0.25,4,"sensor_11, sensor_4, sensor_7, sensor_13",20.299083709716797,84.85906219482422,64.55997848510742
+Integrated Gradients,0.5,8,"sensor_11, sensor_4, sensor_7, sensor_13, sensor_20, sensor_15, sensor_21, sensor_17",20.299083709716797,123.64769744873047,103.34861373901367
