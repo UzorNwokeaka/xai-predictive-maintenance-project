@@ -1,6 +1,6 @@
 
 
-# Explainable AI for Human-Centred Predictive Maintenance Using Industrial IoT Sensor Data
+# Explainable AI for Human-Centred Predictive Maintenance Using Industrial IoT Sensor Data.
 
 **A Case Study of Remaining Useful Life Prediction in NASA Turbofan Engines**
 
