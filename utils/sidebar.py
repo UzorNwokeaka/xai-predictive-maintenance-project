@@ -8,7 +8,7 @@ def render_sidebar():
 
     st.sidebar.markdown(
         """
-        ## Explainable AI
+        ## Explainable AI (XAI)
 
         **Predictive Maintenance**
 
@@ -18,12 +18,12 @@ def render_sidebar():
         University of Suffolk
 
         ---
-        **Version 1.1**
+        **Version 1.0**
         """
     )
 
     st.sidebar.markdown("---")
 
     st.sidebar.caption(
-        "Human-Centric Decision Support for Industrial Predictive Maintenance"
+        "Human-Centred Decision Support for Industrial Predictive Maintenance"
     )

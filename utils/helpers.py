@@ -44,9 +44,9 @@ def footer():
     st.markdown(
         """
         <div class='footer'>
-        Explainable AI for Human-Centric Predictive Maintenance |
+        Explainable AI for Human-Centred Predictive Maintenance |
         MSc Data Science & Artificial Intelligence |
-        University of Suffolk
+        University of Suffolk | Uzordina Nwokeaka (s311242) | Version 1.0 (c) 2026
         </div>
         """,
         unsafe_allow_html=True
