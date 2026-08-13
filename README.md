@@ -20,7 +20,7 @@
 
 ---
 
-## Project Overview
+## Project Overview.
 
 Predictive maintenance has become a key enabler of Industry 4.0 and Industry 5.0 by allowing organisations to predict equipment failures before they occur. However, many state-of-the-art deep learning models operate as "black boxes", making it difficult for maintenance engineers to understand why predictions are made.
 
